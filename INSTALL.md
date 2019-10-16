@@ -3,9 +3,14 @@ Installing Jenkins for Dataverse
 
 ## Quickstart
 
-This should spin up a working Jenkins installation on AWS EC2:
+This should spin up a working Jenkins installation on AWS EC2 (on port 8080):
 
     ec2/ec2-create-instance.sh -b master -r https://github.com/IQSS/dataverse-jenkins.git
+
+To log in:
+
+- username: admin
+- password: admin
 
 See below for other ways to install Jenkins.
 
