@@ -36,9 +36,17 @@ If the installation was successful, you should be able to get the version of Jen
 
 ## Adding a job
 
-Assuming you have already cloned the repo, as root:
+Install the job-import-plugin. https://plugins.jenkins.io/job-import-plugin has docs for this plugin.
 
-    cd dataverse-jenkins
+    java -jar /opt/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin install-plugin job-import-plugin
+
+After installing the plugin, restart Jenkins.
+
+    java -jar /opt/jenkins-cli.jar -s http://localhost:8080 -auth admin:admin install-plugin restart
+
+Assuming you have already cloned the repo you can use this script to add the "IQSS-Dataverse-Develop.xml" job (which is hard coded as an example):
+
+    cd jenkins
     ./import-job.sh
 
 [t2.large]: https://aws.amazon.com/ec2/instance-types/t2/
