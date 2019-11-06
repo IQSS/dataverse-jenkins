@@ -7,7 +7,13 @@ This should spin up a working Jenkins installation on AWS EC2:
 
     ec2/ec2-create-instance.sh -b develop -r https://github.com/IQSS/dataverse-jenkins.git
 
-See below for other ways to install Jenkins.
+## Custom Configuration
+
+You can customize your installation of Jenkins by passing a custom "group vars" file.
+
+    cp ansible/defaults/main.yml groupvars.yml
+    vi groupvars.yml # add AWS credentials, etc.
+    ec2/ec2-create-instance.sh -b develop -r https://github.com/IQSS/dataverse-jenkins.git -g groupvars.yml
 
 ## Hardware Requirements
 
