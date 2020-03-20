@@ -1,0 +1,143 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>IQSS-Dataverse-Develop build for GDCC</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.0.12"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.25.1">
+      <doNotScan>false</doNotScan>
+    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.5">
+      <projectUrl>https://github.com/IQSS/dataverse/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.1.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/IQSS/dataverse.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/develop</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/usr/bin/env bash
+
+echo &quot;exit on error&quot;
+set -e
+
+echo &quot;start with a clean plate&quot;
+rm -rf target/
+
+echo &quot;package warfile&quot;
+mvn -DcompilerArgument=-Xlint:unchecked test -P all-unit-tests package
+
+echo &quot;generate HTML SureFire output&quot;
+mvn surefire-report:report</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.9.1">
+      <config>
+        <scriptFiles/>
+        <groovyScripts/>
+        <buildSteps>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <hudson.tasks.Shell>
+                <command>curl -O https://raw.githubusercontent.com/IQSS/dataverse-ansible/master/ec2/ec2-create-instance.sh
+chmod 755 ec2-create-instance.sh
+curl -o groupvars.yml https://raw.githubusercontent.com/IQSS/dataverse-ansible/master/tests/group_vars/vagrant.yml
+sed -i -- &apos;s#zipurl.*#zipurl: https://s3-eu-west-1.amazonaws.com/payara.fish/Payara+Downloads/5.201/payara-5.201.zip#g&apos; groupvars.yml</command>
+              </hudson.tasks.Shell>
+            </buildSteps>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <hudson.tasks.Shell>
+                <command>./ec2-create-instance.sh -b develop -r https://github.com/IQSS/dataverse.git -t jenkins_delete_me -l target -g groupvars.yml</command>
+              </hudson.tasks.Shell>
+            </buildSteps>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+        </buildSteps>
+        <markBuildUnstable>false</markBuildUnstable>
+      </config>
+    </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.28">
+      <testResults>target/surefire-reports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <healthScaleFactor>1.0</healthScaleFactor>
+      <allowEmptyResults>false</allowEmptyResults>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@7.3.0">
+      <analysisTools>
+        <io.jenkins.plugins.analysis.warnings.Java>
+          <id></id>
+          <name></name>
+          <pattern></pattern>
+          <reportEncoding></reportEncoding>
+          <skipSymbolicLinks>false</skipSymbolicLinks>
+        </io.jenkins.plugins.analysis.warnings.Java>
+        <io.jenkins.plugins.analysis.warnings.MavenConsole>
+          <id></id>
+          <name></name>
+          <pattern></pattern>
+          <reportEncoding></reportEncoding>
+          <skipSymbolicLinks>false</skipSymbolicLinks>
+        </io.jenkins.plugins.analysis.warnings.MavenConsole>
+      </analysisTools>
+      <sourceCodeEncoding></sourceCodeEncoding>
+      <sourceDirectory></sourceDirectory>
+      <ignoreQualityGate>false</ignoreQualityGate>
+      <ignoreFailedBuilds>true</ignoreFailedBuilds>
+      <referenceJobName>-</referenceJobName>
+      <failOnError>false</failOnError>
+      <healthy>0</healthy>
+      <unhealthy>0</unhealthy>
+      <minimumSeverity plugin="analysis-model-api@7.0.4">
+        <name>LOW</name>
+      </minimumSeverity>
+      <filters/>
+      <isEnabledForFailure>true</isEnabledForFailure>
+      <isAggregatingResults>false</isAggregatingResults>
+      <isBlameDisabled>false</isBlameDisabled>
+      <isForensicsDisabled>false</isForensicsDisabled>
+      <qualityGates/>
+      <trendChartType>AGGREGATION_TOOLS</trendChartType>
+    </io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
+  </publishers>
+  <buildWrappers>
+    <org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@2.0.4">
+      <template>#${BUILD_NUMBER}: ${GIT_BRANCH}, SHA:${GIT_REVISION, length=8} (${BUILD_CAUSE})</template>
+      <descriptionTemplate></descriptionTemplate>
+      <runAtStart>true</runAtStart>
+      <runAtEnd>true</runAtEnd>
+    </org.jenkinsci.plugins.buildnamesetter.BuildNameSetter>
+  </buildWrappers>
+</project>
