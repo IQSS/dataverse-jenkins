@@ -5,20 +5,20 @@
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.1.1"/>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.1">
       <doNotScan>false</doNotScan>
     </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
     <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.31.0">
       <projectUrl>https://github.com/IQSS/dataverse/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@2.5.8">
+    <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@2.6.0">
       <durationName>minute</durationName>
       <count>1</count>
       <userBoost>false</userBoost>
     </jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.3.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.4.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -59,10 +59,11 @@ mvn -DcompilerArgument=-Xlint:unchecked test -P all-unit-tests package
 
 echo &quot;generate HTML SureFire output&quot;
 mvn surefire-report:report</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.10.0">
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.11.0">
       <config>
         <scriptFiles/>
         <groovyScripts/>
@@ -78,8 +79,10 @@ mvn surefire-report:report</command>
                 <command>curl -O https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/master/ec2/ec2-create-instance.sh
 chmod 755 ec2-create-instance.sh
 curl -o jenkins.yml https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/master/tests/group_vars/jenkins.yml</command>
+                <configuredLocalRules/>
               </hudson.tasks.Shell>
             </buildSteps>
+            <stopOnFailure>false</stopOnFailure>
           </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
           <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
             <results>
@@ -89,21 +92,30 @@ curl -o jenkins.yml https://raw.githubusercontent.com/GlobalDataverseCommunityCo
             <executeOn>BOTH</executeOn>
             <buildSteps>
               <hudson.tasks.Shell>
-                <command>./ec2-create-instance.sh -b develop -r https://github.com/IQSS/dataverse.git -t jenkins_delete_me -l target -g jenkins.yml -s t3a.large -d</command>
+                <command>./ec2-create-instance.sh -b develop -r https://github.com/IQSS/dataverse.git -t jenkins_delete_me -l target -g jenkins.yml -s t3a.large -d
+
+if [ ! -f &quot;./ansible_complete&quot; ]; then
+    echo &quot;Ansible run terminated abnormally. Please check console output.&quot;
+    exit 1
+else
+    /bin/rm ./ansible_complete
+fi</command>
+                <configuredLocalRules/>
               </hudson.tasks.Shell>
             </buildSteps>
+            <stopOnFailure>false</stopOnFailure>
           </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
         </buildSteps>
         <markBuildUnstable>false</markBuildUnstable>
       </config>
     </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
-    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.30">
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.34">
       <testResults>target/surefire-reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <healthScaleFactor>1.0</healthScaleFactor>
       <allowEmptyResults>false</allowEmptyResults>
     </hudson.tasks.junit.JUnitResultArchiver>
-    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@8.4.0">
+    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@8.4.1">
       <analysisTools>
         <io.jenkins.plugins.analysis.warnings.Java>
           <id></id>
@@ -128,7 +140,7 @@ curl -o jenkins.yml https://raw.githubusercontent.com/GlobalDataverseCommunityCo
       <failOnError>false</failOnError>
       <healthy>0</healthy>
       <unhealthy>0</unhealthy>
-      <minimumSeverity plugin="analysis-model-api@8.2.0">
+      <minimumSeverity plugin="analysis-model-api@8.3.1">
         <name>LOW</name>
       </minimumSeverity>
       <filters/>
