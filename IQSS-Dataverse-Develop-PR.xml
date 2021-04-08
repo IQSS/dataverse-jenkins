@@ -1,46 +1,32 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject plugin="workflow-multibranch@2.22">
+<org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject plugin="workflow-multibranch@2.23">
   <actions/>
   <description>IQSS-Dataverse-Develop-PR</description>
   <displayName>IQSS-Dataverse-Develop-PR</displayName>
   <properties>
-    <org.jenkinsci.plugins.docker.workflow.declarative.FolderConfig plugin="docker-workflow@1.24">
+    <org.jenkinsci.plugins.docker.workflow.declarative.FolderConfig plugin="docker-workflow@1.26">
       <dockerLabel></dockerLabel>
       <registry plugin="docker-commons@1.17"/>
     </org.jenkinsci.plugins.docker.workflow.declarative.FolderConfig>
-    <org.jenkinsci.plugins.workflow.libs.FolderLibraries plugin="workflow-cps-global-lib@2.17">
-      <libraries>
-        <org.jenkinsci.plugins.workflow.libs.LibraryConfiguration>
-          <implicit>false</implicit>
-          <allowVersionOverride>true</allowVersionOverride>
-          <includeInChangesets>true</includeInChangesets>
-        </org.jenkinsci.plugins.workflow.libs.LibraryConfiguration>
-      </libraries>
-    </org.jenkinsci.plugins.workflow.libs.FolderLibraries>
   </properties>
-  <folderViews class="jenkins.branch.MultiBranchProjectViewHolder" plugin="branch-api@2.6.0">
+  <folderViews class="jenkins.branch.MultiBranchProjectViewHolder" plugin="branch-api@2.6.3">
     <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
   </folderViews>
   <healthMetrics/>
-  <icon class="jenkins.branch.MetadataActionFolderIcon" plugin="branch-api@2.6.0">
+  <icon class="jenkins.branch.MetadataActionFolderIcon" plugin="branch-api@2.6.3">
     <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
   </icon>
-  <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.14">
+  <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.15">
     <pruneDeadBranches>true</pruneDeadBranches>
     <daysToKeep>14</daysToKeep>
     <numToKeep>10</numToKeep>
   </orphanedItemStrategy>
-  <triggers>
-    <com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger plugin="cloudbees-folder@6.14">
-      <spec>H/30 * * * *</spec>
-      <interval>14400000</interval>
-    </com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
-  </triggers>
+  <triggers/>
   <disabled>false</disabled>
-  <sources class="jenkins.branch.MultiBranchProject$BranchSourceList" plugin="branch-api@2.6.0">
+  <sources class="jenkins.branch.MultiBranchProject$BranchSourceList" plugin="branch-api@2.6.3">
     <data>
       <jenkins.branch.BranchSource>
-        <source class="org.jenkinsci.plugins.github_branch_source.GitHubSCMSource" plugin="github-branch-source@2.9.0">
+        <source class="org.jenkinsci.plugins.github_branch_source.GitHubSCMSource" plugin="github-branch-source@2.10.2">
           <id>ba6549c3-1c21-4967-aae8-8fd54e3edd82</id>
           <apiUri>https://api.github.com</apiUri>
           <credentialsId>github-dataversebot</credentialsId>
