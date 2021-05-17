@@ -1,0 +1,37 @@
+pipeline {
+  agent any
+
+  stages {
+
+    stage('Build') {
+      steps {
+        script {
+          env.PR_BRANCH = env.CHANGE_BRANCH
+          // if pull request isn't from IQSS, CHANGE_FORK only provides org/user
+          if (env.CHANGE_FORK) {
+            env.PR_REPO = "https://github.com/" + env.CHANGE_FORK + "/dataverse"
+          } else {
+            env.PR_REPO = env.GIT_URL
+          }
+        }
+	// clean plate
+        sh 'rm -rf target/*'
+        // do work
+        sh './tests/jenkins/podman/run_test_suite.bash -r ${PR_REPO} -b ${PR_BRANCH}'
+      }
+    }
+
+    stage('Post') {
+      steps {
+	junit 'target/surefire-reports/*.xml'
+	step(
+	  [$class: 'JacocoPublisher', 
+	  execPattern: 'target/*.exec',
+	  classPattern: 'target/classes',
+	  sourcePattern: 'src/main/java',
+	  exclusionPattern: 'src/test*']
+	)
+      }
+    }
+  }
+}
