@@ -77,7 +77,7 @@ echo ""
 # current incompatibility in centos7 with sudo and raised values in /etc/security/limits.conf
 # just run solr as root for now instead. sigh.
 #sudo -u solr /usr/local/solr/bin/solr start
-cp /dataverse/conf/solr/8.8.1/*.xml /usr/local/solr/server/solr/collection1/conf/
+cp /dataverse/conf/solr/8.11.1/*.xml /usr/local/solr/server/solr/collection1/conf/
 echo "starting solr"
 /usr/local/solr/bin/solr start -force
 

@@ -1,11 +1,11 @@
-FROM docker.io/geerlingguy/docker-rockylinux8-ansible:latest
+FROM rockylinux:latest
 
 # component arguments. maybe we'll make these override-able.
 ARG DEFAULT_CONFIG=https://raw.githubusercontent.com/IQSS/dataverse/develop/scripts/installer/default.config
-ARG JACOCO_ZIP=https://repo1.maven.org/maven2/org/jacoco/jacoco/0.8.6/jacoco-0.8.6.zip
-ARG MAVEN_URL=https://www-us.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-ARG PAYARA_URL=https://s3-eu-west-1.amazonaws.com/payara.fish/Payara+Downloads/5.2020.6/payara-5.2020.6.zip
-ARG SOLR_URL=https://archive.apache.org/dist/lucene/solr/8.8.1/solr-8.8.1.tgz
+ARG JACOCO_ZIP=https://repo1.maven.org/maven2/org/jacoco/jacoco/0.8.7/jacoco-0.8.7.zip
+ARG MAVEN_URL=https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz
+ARG PAYARA_URL=https://s3-eu-west-1.amazonaws.com/payara.fish/Payara+Downloads/5.2021.6/payara-5.2021.6.zip
+ARG SOLR_URL=https://archive.apache.org/dist/lucene/solr/8.11.1/solr-8.11.1.tgz
 
 # PR repo and branch arguments. May be passed as Docker --build-args
 ARG PR_REPO
