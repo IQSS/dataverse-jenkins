@@ -4,21 +4,21 @@
   <description>IQSS-Dataverse-Payara6 build for GDCC</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.8"/>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.4.0">
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.10"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.4.1">
       <doNotScan>false</doNotScan>
     </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.36.1">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.37.1">
       <projectUrl>https://github.com/IQSS/dataverse/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@2.1051.v9985666b_f6cc">
+    <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@2.1122.v09cb_8ea_8a_724">
       <durationName>minute</durationName>
       <count>1</count>
       <userBoost>false</userBoost>
     </jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.0.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.1.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -27,7 +27,7 @@
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/8305-payara6-ee10</name>
+        <name>*/8305-payara6-ee10-v3</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -39,7 +39,7 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.36.1">
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.37.1">
       <spec></spec>
     </com.cloudbees.jenkins.GitHubPushTrigger>
   </triggers>
@@ -79,9 +79,9 @@ mvn surefire-report:report</command>
             <executeOn>BOTH</executeOn>
             <buildSteps>
               <hudson.tasks.Shell>
-                <command>curl -O https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/develop/ec2/ec2-create-instance.sh
+                <command>curl -O https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/306_payara6/ec2/ec2-create-instance.sh
 chmod 755 ec2-create-instance.sh
-curl -o payara6.yml https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/develop/tests/group_vars/payara6.yml</command>
+curl -o payara6.yml https://raw.githubusercontent.com/GlobalDataverseCommunityConsortium/dataverse-ansible/306_payara6/tests/group_vars/payara6.yml</command>
                 <configuredLocalRules/>
               </hudson.tasks.Shell>
             </buildSteps>
@@ -95,7 +95,7 @@ curl -o payara6.yml https://raw.githubusercontent.com/GlobalDataverseCommunityCo
             <executeOn>BOTH</executeOn>
             <buildSteps>
               <hudson.tasks.Shell>
-                <command>./ec2-create-instance.sh -t jenkins_delete_me -l target -g payara6.yml -s t3a.large -d
+                <command>./ec2-create-instance.sh -t jenkins_delete_me -l target -g payara6.yml -s t3a.large -d -v
 
 if [ ! -f &quot;./ansible_complete&quot; ]; then
     echo &quot;Ansible run terminated abnormally. Please check console output.&quot;
@@ -112,7 +112,7 @@ fi</command>
         <markBuildUnstable>false</markBuildUnstable>
       </config>
     </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
-    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1166.va_436e268e972">
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1214.va_2f9db_3e6de0">
       <testResults>target/surefire-reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <healthScaleFactor>1.0</healthScaleFactor>
@@ -122,12 +122,12 @@ fi</command>
       <skipMarkingBuildUnstable>false</skipMarkingBuildUnstable>
       <skipOldReports>false</skipOldReports>
     </hudson.tasks.junit.JUnitResultArchiver>
-    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@9.22.0">
+    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@10.2.0">
       <analysisTools>
         <io.jenkins.plugins.analysis.warnings.Java>
           <id></id>
           <name></name>
-          <jenkins plugin="plugin-util-api@2.20.0"/>
+          <jenkins plugin="plugin-util-api@3.3.0"/>
           <pattern></pattern>
           <reportEncoding></reportEncoding>
           <skipSymbolicLinks>false</skipSymbolicLinks>
@@ -135,7 +135,7 @@ fi</command>
         <io.jenkins.plugins.analysis.warnings.MavenConsole>
           <id></id>
           <name></name>
-          <jenkins plugin="plugin-util-api@2.20.0"/>
+          <jenkins plugin="plugin-util-api@3.3.0"/>
           <pattern></pattern>
           <reportEncoding></reportEncoding>
           <skipSymbolicLinks>false</skipSymbolicLinks>
@@ -149,7 +149,7 @@ fi</command>
       <failOnError>false</failOnError>
       <healthy>0</healthy>
       <unhealthy>0</unhealthy>
-      <minimumSeverity plugin="analysis-model-api@10.21.0">
+      <minimumSeverity plugin="analysis-model-api@11.3.0">
         <name>LOW</name>
       </minimumSeverity>
       <filters/>
@@ -163,7 +163,7 @@ fi</command>
       <trendChartType>AGGREGATION_TOOLS</trendChartType>
       <scm></scm>
     </io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
-    <hudson.plugins.jacoco.JacocoPublisher plugin="jacoco@3.3.2">
+    <hudson.plugins.jacoco.JacocoPublisher plugin="jacoco@3.3.3">
       <execPattern>target/jacoco_merged.exec</execPattern>
       <classPattern>target/classes</classPattern>
       <sourcePattern>target/src/*/java</sourcePattern>
@@ -194,7 +194,7 @@ fi</command>
       <deltaClassCoverage>0</deltaClassCoverage>
       <buildOverBuild>false</buildOverBuild>
     </hudson.plugins.jacoco.JacocoPublisher>
-    <io.jenkins.plugins.coverage.CoveragePublisher plugin="code-coverage-api@3.4.1">
+    <io.jenkins.plugins.coverage.CoveragePublisher plugin="code-coverage-api@4.7.0">
       <adapters>
         <io.jenkins.plugins.coverage.adapter.JacocoReportAdapter>
           <path>target/site/jacoco/jacoco.xml</path>
@@ -218,7 +218,7 @@ fi</command>
       <skipPublishingChecks>false</skipPublishingChecks>
       <checksName>Code Coverage</checksName>
     </io.jenkins.plugins.coverage.CoveragePublisher>
-    <org.jenkinsci.plugins.github.status.GitHubCommitStatusSetter plugin="github@1.36.1">
+    <org.jenkinsci.plugins.github.status.GitHubCommitStatusSetter plugin="github@1.37.1">
       <commitShaSource class="org.jenkinsci.plugins.github.status.sources.BuildDataRevisionShaSource"/>
       <reposSource class="org.jenkinsci.plugins.github.status.sources.AnyDefinedRepositorySource"/>
       <contextSource class="org.jenkinsci.plugins.github.status.sources.DefaultCommitContextSource"/>
@@ -228,7 +228,7 @@ fi</command>
     </org.jenkinsci.plugins.github.status.GitHubCommitStatusSetter>
   </publishers>
   <buildWrappers>
-    <org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@2.2.0">
+    <org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@2.2.1">
       <template>#${BUILD_NUMBER}: ${GIT_BRANCH}, SHA:${GIT_REVISION, length=8} (${BUILD_CAUSE})</template>
       <descriptionTemplate></descriptionTemplate>
       <runAtStart>true</runAtStart>
