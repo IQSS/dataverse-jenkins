@@ -4,12 +4,12 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.10"/>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.4.1">
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.12"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.5.0">
       <doNotScan>false</doNotScan>
     </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -33,7 +33,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>VERSION=develop
+      <command>VERSION=6.2
 TARBALL=guides$VERSION.tar.gz
 #echo $VERSION
 #echo $TARBALL
@@ -65,7 +65,9 @@ TARBALL=guides$VERSION.tar.gz
 #(cd $WORKSPACE/doc/sphinx-guides; make clean; make html; make latexpdf; cp build/latex/Dataverse.pdf build/html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL redacted@guides.dataverse.org:/tmp)
 
 # build without latexPDF which doesn&apos;t compile
-(cd $WORKSPACE/doc/sphinx-guides; make clean; make html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL centos@guides.dataverse.org:/tmp)
+# I have tried inserting &quot;pip3 install -r requirements.txt; &quot; between the cd and make commands below - 
+# see the failed buidl #403 for error messages - L.A. 
+(cd $WORKSPACE/doc/sphinx-guides; pip3.9 install -r requirements.txt; make clean; make html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL centos@guides.dataverse.org:/tmp)
 
 ssh -l centos guides.dataverse.org &quot;(mkdir -p /var/www/html/en/$VERSION &amp;&amp; cd /var/www/html/en/$VERSION &amp;&amp; tar xvzf /tmp/$TARBALL)&quot;
 </command>
