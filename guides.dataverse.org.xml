@@ -67,9 +67,9 @@ TARBALL=guides$VERSION.tar.gz
 # build without latexPDF which doesn&apos;t compile
 # I have tried inserting &quot;pip3 install -r requirements.txt; &quot; between the cd and make commands below - 
 # see the failed buidl #403 for error messages - L.A. 
-(cd $WORKSPACE/doc/sphinx-guides; pip3.9 install -r requirements.txt; make clean; make html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL centos@guides.dataverse.org:/tmp)
+(cd $WORKSPACE/doc/sphinx-guides; pip3.9 install -r requirements.txt; make clean; make html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL rocky@54.198.97.45:/tmp)
 
-ssh -l centos guides.dataverse.org &quot;(mkdir -p /var/www/html/en/$VERSION &amp;&amp; cd /var/www/html/en/$VERSION &amp;&amp; tar xvzf /tmp/$TARBALL)&quot;
+ssh -l rocky@54.198.97.45 &quot;(mkdir -p /var/www/html/en/$VERSION &amp;&amp; cd /var/www/html/en/$VERSION &amp;&amp; tar xvzf /tmp/$TARBALL)&quot;
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
