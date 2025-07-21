@@ -4,12 +4,12 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.12"/>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.5.0">
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.13"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.5.2">
       <doNotScan>false</doNotScan>
     </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.4.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -18,7 +18,7 @@
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/develop</name>
+        <name>*/master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -33,7 +33,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>VERSION=6.2
+      <command>VERSION=6.7
 TARBALL=guides$VERSION.tar.gz
 #echo $VERSION
 #echo $TARBALL
@@ -66,10 +66,10 @@ TARBALL=guides$VERSION.tar.gz
 
 # build without latexPDF which doesn&apos;t compile
 # I have tried inserting &quot;pip3 install -r requirements.txt; &quot; between the cd and make commands below - 
-# see the failed buidl #403 for error messages - L.A. 
-(cd $WORKSPACE/doc/sphinx-guides; pip3.9 install -r requirements.txt; make clean; make html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL rocky@54.198.97.45:/tmp)
+# see the failed build #403 for error messages - L.A.
+(cd $WORKSPACE/doc/sphinx-guides; pip3.12 install -r requirements.txt; make clean; make html; make epub; cp build/epub/Dataverse.epub build/html; cd build/html; tar cvzf /tmp/$TARBALL .; scp /tmp/$TARBALL rocky@54.198.97.45:/tmp)
 
-ssh -l rocky@54.198.97.45 &quot;(mkdir -p /var/www/html/en/$VERSION &amp;&amp; cd /var/www/html/en/$VERSION &amp;&amp; tar xvzf /tmp/$TARBALL)&quot;
+ssh -l rocky 54.198.97.45 &quot;(mkdir -p /var/www/html/en/$VERSION &amp;&amp; cd /var/www/html/en/$VERSION &amp;&amp; tar xvzf /tmp/$TARBALL)&quot;
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
