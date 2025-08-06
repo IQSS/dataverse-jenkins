@@ -140,12 +140,26 @@ mvn surefire-report:report</command>
             <executeOn>BOTH</executeOn>
             <buildSteps>
               <hudson.tasks.Shell>
-                <command>ls -lat ~/.ssh
-scp $WORKSPACE/target/dataverse-5.13.war redacted@dataverse-internal.iq.harvard.edu:/tmp
-ssh -l redacted dataverse-internal.iq.harvard.edu &quot;chmod 666 /tmp/dataverse-5.13.war&quot;
-ssh -l redacted dataverse-internal.iq.harvard.edu &quot;cp /tmp/dataverse-5.13.war /usr/local/payara5/glassfish/domains/domain1/autodeploy&quot;</command>
-                <configuredLocalRules/>
-              </hudson.tasks.Shell>
+  <command>#!/usr/bin/env bash
+
+# Exit on error
+set -e
+
+# Get Dataverse version from pom.xml
+VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec -f modules/dataverse-parent/pom.xml)
+WARFILE="dataverse-$VERSION.war"
+
+echo "Detected Dataverse version: $VERSION"
+
+# Copy WAR to internal server and deploy
+ls -lat ~/.ssh
+scp "$WORKSPACE/target/$WARFILE" redacted@dataverse-internal.iq.harvard.edu:/tmp
+ssh -l redacted dataverse-internal.iq.harvard.edu "chmod 666 /tmp/$WARFILE"
+ssh -l redacted dataverse-internal.iq.harvard.edu "cp /tmp/$WARFILE /usr/local/payara5/glassfish/domains/domain1/autodeploy"
+  </command>
+  <configuredLocalRules/>
+</hudson.tasks.Shell>
+
             </buildSteps>
             <stopOnFailure>false</stopOnFailure>
           </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
