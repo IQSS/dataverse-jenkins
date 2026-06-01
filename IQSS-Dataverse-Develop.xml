@@ -4,21 +4,21 @@
   <description>IQSS-Dataverse-Develop build for GDCC</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.5"/>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.0.1">
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.13"/>
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.5.2">
       <doNotScan>false</doNotScan>
     </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.34.0">
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.40.0">
       <projectUrl>https://github.com/IQSS/dataverse/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
-    <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@2.6.5">
+    <jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl plugin="branch-api@2.1178.v969d9eb_c728e">
       <durationName>minute</durationName>
       <count>1</count>
       <userBoost>false</userBoost>
     </jenkins.branch.RateLimitBranchProperty_-JobPropertyImpl>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.8.2">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.4.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -39,7 +39,7 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.34.0">
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.40.0">
       <spec></spec>
     </com.cloudbees.jenkins.GitHubPushTrigger>
   </triggers>
@@ -66,7 +66,7 @@ mvn surefire-report:report</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@3.0.0">
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@3.3.0-654.v67cf36130d78">
       <config>
         <scriptFiles/>
         <groovyScripts/>
@@ -112,20 +112,24 @@ fi</command>
         <markBuildUnstable>false</markBuildUnstable>
       </config>
     </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
-    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1.52">
+    <hudson.tasks.junit.JUnitResultArchiver plugin="junit@1296.vb_f538b_c88630">
       <testResults>target/surefire-reports/*.xml</testResults>
-      <keepLongStdio>false</keepLongStdio>
+      <stdioRetention>NONE</stdioRetention>
+      <keepProperties>false</keepProperties>
+      <keepTestNames>false</keepTestNames>
       <healthScaleFactor>1.0</healthScaleFactor>
       <allowEmptyResults>false</allowEmptyResults>
       <skipPublishingChecks>false</skipPublishingChecks>
       <checksName>Tests</checksName>
       <skipMarkingBuildUnstable>false</skipMarkingBuildUnstable>
+      <skipOldReports>false</skipOldReports>
     </hudson.tasks.junit.JUnitResultArchiver>
-    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@9.5.0">
+    <io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@11.4.1">
       <analysisTools>
         <io.jenkins.plugins.analysis.warnings.Java>
           <id></id>
           <name></name>
+          <jenkins plugin="plugin-util-api@4.1.0"/>
           <pattern></pattern>
           <reportEncoding></reportEncoding>
           <skipSymbolicLinks>false</skipSymbolicLinks>
@@ -133,32 +137,35 @@ fi</command>
         <io.jenkins.plugins.analysis.warnings.MavenConsole>
           <id></id>
           <name></name>
+          <jenkins plugin="plugin-util-api@4.1.0"/>
           <pattern></pattern>
           <reportEncoding></reportEncoding>
           <skipSymbolicLinks>false</skipSymbolicLinks>
         </io.jenkins.plugins.analysis.warnings.MavenConsole>
       </analysisTools>
       <sourceCodeEncoding></sourceCodeEncoding>
-      <sourceDirectory></sourceDirectory>
+      <sourceDirectories/>
+      <sourceCodeRetention>EVERY_BUILD</sourceCodeRetention>
       <ignoreQualityGate>false</ignoreQualityGate>
-      <ignoreFailedBuilds>true</ignoreFailedBuilds>
       <failOnError>false</failOnError>
       <healthy>0</healthy>
       <unhealthy>0</unhealthy>
-      <minimumSeverity plugin="analysis-model-api@10.3.0">
+      <minimumSeverity plugin="analysis-model-api@12.4.0">
         <name>LOW</name>
       </minimumSeverity>
       <filters/>
       <isEnabledForFailure>true</isEnabledForFailure>
       <isAggregatingResults>false</isAggregatingResults>
+      <quiet>false</quiet>
       <isBlameDisabled>false</isBlameDisabled>
       <skipPublishingChecks>false</skipPublishingChecks>
-      <publishAllIssues>false</publishAllIssues>
+      <checksAnnotationScope>NEW</checksAnnotationScope>
+      <skipPostProcessing>false</skipPostProcessing>
       <qualityGates/>
       <trendChartType>AGGREGATION_TOOLS</trendChartType>
       <scm></scm>
     </io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
-    <hudson.plugins.jacoco.JacocoPublisher plugin="jacoco@3.3.0">
+    <hudson.plugins.jacoco.JacocoPublisher plugin="jacoco@3.3.6">
       <execPattern>target/jacoco_merged.exec</execPattern>
       <classPattern>target/classes</classPattern>
       <sourcePattern>target/src/*/java</sourcePattern>
@@ -189,15 +196,18 @@ fi</command>
       <deltaClassCoverage>0</deltaClassCoverage>
       <buildOverBuild>false</buildOverBuild>
     </hudson.plugins.jacoco.JacocoPublisher>
-    <io.jenkins.plugins.coverage.CoveragePublisher plugin="code-coverage-api@1.4.0">
+    <io.jenkins.plugins.coverage.CoveragePublisher plugin="code-coverage-api@4.99.0">
       <adapters>
         <io.jenkins.plugins.coverage.adapter.JacocoReportAdapter>
-          <path>target/site/jacoco/jacoco.xml</path>
+          <path>target/site/jacoco-unit-test-coverage-report/jacoco.xml</path>
           <mergeToOneReport>true</mergeToOneReport>
           <thresholds class="linked-list"/>
         </io.jenkins.plugins.coverage.adapter.JacocoReportAdapter>
       </adapters>
       <globalThresholds class="linked-list"/>
+      <scm></scm>
+      <sourceCodeEncoding></sourceCodeEncoding>
+      <sourceDirectories/>
       <failUnhealthy>false</failUnhealthy>
       <failUnstable>false</failUnstable>
       <failNoReports>false</failNoReports>
@@ -208,8 +218,9 @@ fi</command>
       <calculateDiffForChangeRequests>false</calculateDiffForChangeRequests>
       <failBuildIfCoverageDecreasedInChangeRequest>false</failBuildIfCoverageDecreasedInChangeRequest>
       <skipPublishingChecks>false</skipPublishingChecks>
+      <checksName>Code Coverage</checksName>
     </io.jenkins.plugins.coverage.CoveragePublisher>
-    <org.jenkinsci.plugins.github.status.GitHubCommitStatusSetter plugin="github@1.34.0">
+    <org.jenkinsci.plugins.github.status.GitHubCommitStatusSetter plugin="github@1.40.0">
       <commitShaSource class="org.jenkinsci.plugins.github.status.sources.BuildDataRevisionShaSource"/>
       <reposSource class="org.jenkinsci.plugins.github.status.sources.AnyDefinedRepositorySource"/>
       <contextSource class="org.jenkinsci.plugins.github.status.sources.DefaultCommitContextSource"/>
@@ -219,7 +230,7 @@ fi</command>
     </org.jenkinsci.plugins.github.status.GitHubCommitStatusSetter>
   </publishers>
   <buildWrappers>
-    <org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@2.2.0">
+    <org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@2.4.3">
       <template>#${BUILD_NUMBER}: ${GIT_BRANCH}, SHA:${GIT_REVISION, length=8} (${BUILD_CAUSE})</template>
       <descriptionTemplate></descriptionTemplate>
       <runAtStart>true</runAtStart>

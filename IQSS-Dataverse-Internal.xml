@@ -4,7 +4,7 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.10"/>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.13"/>
     <jenkins.model.BuildDiscarderProperty>
       <strategy class="hudson.tasks.LogRotator">
         <daysToKeep>10</daysToKeep>
@@ -13,24 +13,24 @@
         <artifactNumToKeep>-1</artifactNumToKeep>
       </strategy>
     </jenkins.model.BuildDiscarderProperty>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.4.1">
+    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@2.5.2">
       <doNotScan>false</doNotScan>
     </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.37.1">
-      <projectUrl>https://github.com/IQSS/dataverse/</projectUrl>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.40.0">
+      <projectUrl>https://github.com/IQSS/dataverse.git/</projectUrl>
       <displayName></displayName>
     </com.coravy.hudson.plugins.github.GithubProjectProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.0">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.4.0">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/IQSS/dataverse.git</url>
+        <url>https://github.com/IQSS/dataverse.git/</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>*/9663-add-AskDataverse</name>
+        <name>*/master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
@@ -45,33 +45,58 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>COMMIT_SHA1=`echo $GIT_COMMIT | cut -c-7`
-echo &quot;build.number=${BUILD_NUMBER}-${COMMIT_SHA1}&quot; &gt; $WORKSPACE/src/main/java/BuildNumber.properties</command>
+      <command>#!/usr/bin/env bash
+set -e
+source /etc/profile.d/maven.sh
+rm -rf target/
+COMMIT_SHA1=`echo $GIT_COMMIT | cut -c-7`
+echo &quot;build.number=${BUILD_NUMBER}-${COMMIT_SHA1}&quot; &gt; $WORKSPACE/src/main/java/BuildNumber.properties
+mvn clean -DcompilerArgument=-Xlint:unchecked test -P all-unit-tests package
+echo &quot;generate HTML SureFire output&quot;
+mvn surefire-report:report
+</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>#!/usr/bin/env bash
+set -euo pipefail
 
-echo &quot;exit on error&quot;
-set -e
+echo &quot;=== Build &amp; unit tests (Surefire) ===&quot;
+# Earliest form you used:
+mvn -B clean verify -DskipITs
 
-echo &quot;use maven 3.6.3&quot;
-source /etc/profile.d/maven.sh
+echo &quot;=== Generate HTML SureFire output ===&quot;
+# This produces target/site/surefire-report.html
+mvn -B surefire-report:report
 
-echo &quot;start with a clean plate&quot;
-rm -rf target/
+echo &quot;=== Summarize Surefire results (txt/xml) ===&quot;
+if ls target/surefire-reports/*.txt &gt;/dev/null 2&gt;&amp;1; then
+  for f in target/surefire-reports/*.txt; do
+    echo &quot;--- $f ---&quot;
+    tail -n 200 &quot;$f&quot; || true
+  done
+fi
+ls -lah target/surefire-reports/*.xml || true
 
-echo &quot;package warfile&quot;
-mvn clean -DcompilerArgument=-Xlint:unchecked test -P all-unit-tests package
-#mvn -f modules/dataverse-parent -pl edu.harvard.iq:dataverse -am clean -DcompilerArgument=-Xlint:unchecked test -P all-unit-tests package
+echo &quot;=== List HTML report location ===&quot;
+ls -lah target/site || true
+[ -f target/site/surefire-report.html ] &amp;&amp; echo &quot;HTML: target/site/surefire-report.html&quot;
 
-echo &quot;generate HTML SureFire output&quot;
-mvn surefire-report:report</command>
+echo &quot;=== Collect artifacts for archiving ===&quot;
+ARTDIR=&quot;$WORKSPACE/artifacts&quot;
+mkdir -p &quot;$ARTDIR&quot;
+cp -R target/surefire-reports &quot;$ARTDIR/&quot; || true
+[ -d target/site ] &amp;&amp; cp -R target/site &quot;$ARTDIR/&quot; || true
+[ -f target/dataverse-5.13.war ] &amp;&amp; cp target/dataverse-5.13.war &quot;$ARTDIR/&quot; || true
+
+echo &quot;=== Target dir sanity ===&quot;
+ls -lah target || true
+</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.100">
+    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@1814.v404722f34263">
       <recipientList>$DEFAULT_RECIPIENTS</recipientList>
       <configuredTriggers>
         <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
@@ -118,7 +143,7 @@ mvn surefire-report:report</command>
       <saveOutput>false</saveOutput>
       <disabled>false</disabled>
     </hudson.plugins.emailext.ExtendedEmailPublisher>
-    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@3.2.0-460.va_fda_0fa_26720">
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@3.3.0-654.v67cf36130d78">
       <config>
         <scriptFiles/>
         <groovyScripts/>
@@ -134,16 +159,19 @@ mvn surefire-report:report</command>
           </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
           <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
             <results>
-              <string>SUCCESS</string>
+              <string>ABORTED</string>
             </results>
             <role>BOTH</role>
             <executeOn>BOTH</executeOn>
             <buildSteps>
               <hudson.tasks.Shell>
-                <command>ls -lat ~/.ssh
-scp $WORKSPACE/target/dataverse-5.13.war redacted@dataverse-internal.iq.harvard.edu:/tmp
-ssh -l redacted dataverse-internal.iq.harvard.edu &quot;chmod 666 /tmp/dataverse-5.13.war&quot;
-ssh -l redacted dataverse-internal.iq.harvard.edu &quot;cp /tmp/dataverse-5.13.war /usr/local/payara5/glassfish/domains/domain1/autodeploy&quot;</command>
+                <command># Commented out for 6.10 release on 2026-03-17 by pdurbin
+# Is anyone using this job? pdurbin asked at https://iqss.slack.com/archives/C010LA04BCG/p1773844653380079
+#ls -lat ~/.ssh
+#scp $WORKSPACE/target/dataverse-5.13.war redacted@dataverse-internal.iq.harvard.edu:/tmp
+#ssh -l redacted dataverse-internal.iq.harvard.edu &quot;chmod 666 /tmp/dataverse-5.13.war&quot;
+#ssh -l redacted dataverse-internal.iq.harvard.edu &quot;cp /tmp/dataverse-5.13.war /usr/local/payara5/glassfish/domains/domain1/autodeploy&quot;
+</command>
                 <configuredLocalRules/>
               </hudson.tasks.Shell>
             </buildSteps>
@@ -155,7 +183,13 @@ ssh -l redacted dataverse-internal.iq.harvard.edu &quot;cp /tmp/dataverse-5.13.w
     </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.45">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.46">
+      <patterns>
+        <hudson.plugins.ws__cleanup.Pattern>
+          <pattern></pattern>
+          <type>INCLUDE</type>
+        </hudson.plugins.ws__cleanup.Pattern>
+      </patterns>
       <deleteDirs>false</deleteDirs>
       <cleanupParameter></cleanupParameter>
       <externalDelete></externalDelete>
